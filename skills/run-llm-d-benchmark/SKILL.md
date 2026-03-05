@@ -5,7 +5,7 @@ description: Runs a workload against an already deployed llm-d stack (high-perfo
 
 # Run llm-d Benchmark Skill
 
-## purpose
+## Purpose
 
 Run a specific benchmark harness and workload against an already deployed llm-d stack (high-performance distributed LLM inference). Useful for evaluating the performance of the llm-d stack. When benchmark terminates, store benchmarking results in a local storage. Optioanlly create scripts on top of the raw results to analyze them.
 
@@ -113,9 +113,9 @@ Ask the user whether any analysis of raw results is requested. For example, crea
 > ## 🔔 ALWAYS NOTIFY THE USER BEFORE CREATING ANYTHING
 >
 > **RULE**: Before creating ANY resource — including PVCs, files, or any Kubernetes object — you MUST first tell the user what you are about to create and why.
-
- **RULE**: Before deleting or overriding ANY resources — including PVCs, files, or any Kubernetes object — you MUST first get confirmation from the user.
-
+>
+> **RULE**: Before deleting or overriding ANY resources — including PVCs, files, or any Kubernetes object — you MUST first get confirmation from the user.
+>
 > **Format to use before every creation action**:
 > > "I am about to create `<resource-type>` named `<name>` because `<reason>`. Proceeding now."
 >
@@ -145,7 +145,7 @@ Activate this skill when users need to:
 ## Prerequisites
 
 ### Client Setup
-**Guide**: `https://raw.githubusercontent.com/llm-d/llm-d/guides/prereq/client-setup/README.md`
+**Guide**: `https://github.com/llm-d/llm-d/tree/main/guides/prereq/client-setup/README.md`
 
 Required tools:
 - kubectl
