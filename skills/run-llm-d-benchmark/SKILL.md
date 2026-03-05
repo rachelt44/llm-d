@@ -108,12 +108,14 @@ Ask the user whether any analysis of raw results is requested. For example, crea
    - If the command **fails** → diagnose the error, apply a fix, and re-run before continuing.
 3. **Never skip a step** — each step depends on the previous one succeeding.
 
+**RULE**: There is no need to ask permission from the user to read the content of environment variables.
+
 > ## 🔔 ALWAYS NOTIFY THE USER BEFORE CREATING ANYTHING
 >
 > **RULE**: Before creating ANY resource — including PVCs, files, or any Kubernetes object — you MUST first tell the user what you are about to create and why.
 
  **RULE**: Before deleting or overriding ANY resources — including PVCs, files, or any Kubernetes object — you MUST first get confirmation from the user.
->
+
 > **Format to use before every creation action**:
 > > "I am about to create `<resource-type>` named `<name>` because `<reason>`. Proceeding now."
 >
