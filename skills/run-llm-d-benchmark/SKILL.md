@@ -7,7 +7,7 @@ description: Runs a workload against an already deployed llm-d stack (high-perfo
 
 ## Purpose
 
-Run a specific benchmark harness and workload against an already deployed llm-d stack (high-performance distributed LLM inference). Useful for evaluating the performance of the llm-d stack. When benchmark terminates, store benchmarking results in a local storage. Optioanlly create scripts on top of the raw results to analyze them.
+Run a specific benchmark harness and workload against an already deployed llm-d stack (high-performance distributed LLM inference). Useful for evaluating the performance of the llm-d stack. When benchmark terminates, store benchmarking results in a local storage. Optionally create scripts on top of the raw results to analyze them.
 
 ## Workflow
 
@@ -24,7 +24,7 @@ Verify that the stack is indeed deployed in the detected or provided namespace u
 
 ### Step 2: Verify the existence of a storage class
 
-Make sure Kubernetes storage class for PVCs exists in the namespace, using the command `kubectl get pvc -n $NAMESPACE`. If it doesn't exist, create a PVC after asking the user to provide its required name. make sure the BENCHMARK_PVC environment variable is set to the name of the PVC.
+Make sure Kubernetes storage class for PVCs exists in the namespace, using the command `kubectl get pvc -n $NAMESPACE`. If it doesn't exist, create a PVC after asking the user to provide its required name. Make sure the BENCHMARK_PVC environment variable is set to the name of the PVC.
 
 ### Step 3: Determine the template configuration file for benchmarking and instantiate it
 
@@ -32,7 +32,7 @@ Display to the user the available benchmarking template yaml files located here:
 
 https://github.com/llm-d/llm-d/tree/main/guides/benchmark
 
-Let the user select one of the displayed template configuration files.
+Ask the user select one of the displayed template configuration files.
 
 Instantiate it using the command `envsubst < inference_scheduling_guide_template.yaml > config.yaml`
 
@@ -61,7 +61,7 @@ If a non-default workload is used, update the instantiated configuration file wi
 
 Display the model name specified in the configuration file to the user for verification.
 
-If the user wants to change the model, check which models are available in the cluster. Let the user select one of them, and update the instantiated configuration file with the selected model name.
+If the user wants to change the model, check which models are available in the cluster. Ask the user select one of them, and update the instantiated configuration file with the selected model name.
 
 ### Step 7: Verify the final configuration
 
@@ -69,8 +69,8 @@ Display the instantiated configuration file to the user for verification. If the
 
 **Common customizations include**:
 
- **Model name**: Which model to benchmark (default: Qwen/Qwen3-32B)
-- **Workload type**: Type of synthetic data (random, shared_prefix, etc.)
+ **Model name**: Which model to benchmark 
+- **Workload type**: Type of synthetic data 
 - **Load stages**: Request rates and durations
 - **Input/Output distribution**: Prompt and response length parameters
   - `input_distribution`: min, max, mean, std, total_count
@@ -97,7 +97,7 @@ Ask the user for a path to store the results. Save the benchmarking results by c
 
 ### Step 11: Run analyses and save them
 
-Ask the user whether any analysis of raw results is requested. For example, create specific graphs or tables from raw metric reporting. if the user provides an analysis description, create corresponding analysis scripts, run them, and store them along with their results in the `analysis` directory inside the `results` directory.
+Ask the user whether an analysis of raw results is requested. For example, create specific graphs or tables from the raw metric reporting. The user can also tell you what analysis is needed. If the user requests for an analysis, create corresponding analysis scripts, run them, and store them along with their results in the `analysis` directory inside the `results` directory.
 
 
 #### Execution Rules
