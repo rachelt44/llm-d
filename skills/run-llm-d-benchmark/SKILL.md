@@ -61,7 +61,7 @@ If a non-default workload is used, update the instantiated configuration file wi
 
 Display the model name specified in the configuration file to the user for verification.
 
-If the user wants to change the model, check which models are available in the cluster. Ask the user select one of them, and update the instantiated configuration file with the selected model name.
+Only if the user wants to change to a different model, check which models are available in the stack deployment. Ask the user select one of them, and update the instantiated configuration file with the selected model name.
 
 ### Step 7: Verify the final configuration
 
@@ -163,3 +163,8 @@ Required tools:
 - Use TLS for gateway ingress
 - Audit all deployments and changes
 
+
+## Additional Resources
+
+- **Basic Benchmarking Documentation**: `https://github.com/llm-d/llm-d/blob/main/guides/benchmark/README.md`
+- **Advanced Benchmarking Documentation**: `https://github.com/llm-d/llm-d-benchmark/blob/main/README.md`
