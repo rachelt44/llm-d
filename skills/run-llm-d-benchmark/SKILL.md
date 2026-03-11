@@ -1,6 +1,6 @@
 ---
 name: run-llm-d-benchmark
-description: Runs a workload against an already deployed llm-d stack (high-performance distributed LLM inference), using llm-d-benchmark tooling.
+description: Runs a benchmark workload against an already deployed llm-d stack (high-performance distributed LLM inference) using llm-d-benchmark tooling. Use this skill whenever the user wants to benchmark, load test, measure performance, run inference-perf/guidellm/vllm-benchmark, evaluate throughput or latency, or compare llm-d configuration strategies — even if they don't say "benchmark" explicitly.
 ---
 
 # Run llm-d Benchmark Skill
@@ -11,7 +11,7 @@ Run a specific benchmark harness and workload against an already deployed llm-d 
 
 ## Workflow
 
-### Step 1: Locate the llm-d stack and set namespace accordingly
+### Step 1: Locate the llm-d stack and set environment variables
 
 Locate the llm-d stack according to the following logic:
 
@@ -22,19 +22,53 @@ Locate the llm-d stack according to the following logic:
 
 Verify that the stack is indeed deployed in the detected or provided namespace using kubectl commands. If you cannot locate the stack, ask the user to deploy one and refer to the llm-d-kubernetes deployment skill.
 
-### Step 2: Verify the existence of a storage class
+Also determine and set the `GATEWAY_SVC` environment variable — this is the name of the gateway service that exposes the inference endpoint. You can find it by running:
+```bash
+kubectl get svc -n $NAMESPACE
+```
+Look for the gateway or ingress service (typically named something like `llm-d-gateway` or `inference-gateway`). Ask the user to confirm if ambiguous.
 
-Make sure Kubernetes storage class for PVCs exists in the namespace, using the command `kubectl get pvc -n $NAMESPACE`. If it doesn't exist, create a PVC after asking the user to provide its required name. Make sure the BENCHMARK_PVC environment variable is set to the name of the PVC.
+### Step 2: Verify or create the benchmark PVC
+
+Check whether a PVC already exists for storing benchmark results:
+```bash
+kubectl get pvc -n $NAMESPACE
+```
+
+If a suitable PVC exists, set `BENCHMARK_PVC` to its name and confirm with the user.
+
+If no PVC exists, ask the user for a name and create one with **ReadWriteMany (RWX)** access mode and at least **200Gi** of storage:
+```bash
+BENCHMARK_PVC="<name>"
+cat <<YAML | kubectl -n ${NAMESPACE} apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${BENCHMARK_PVC}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 200Gi
+YAML
+```
+
+Make sure the `BENCHMARK_PVC` environment variable is set.
 
 ### Step 3: Determine the template configuration file for benchmarking and instantiate it
 
-Display to the user the available benchmarking template yaml files located here:
+List the available benchmarking template YAML files from the local `guides/benchmark/` directory:
+```bash
+ls guides/benchmark/*template*.yaml
+```
 
-https://github.com/llm-d/llm-d/tree/main/guides/benchmark
+Display them to the user and ask them to select one. If the local directory is not available, fall back to browsing https://github.com/llm-d/llm-d/tree/main/guides/benchmark.
 
-Ask the user select one of the displayed template configuration files.
-
-Instantiate it using the command `envsubst < inference_scheduling_guide_template.yaml > config.yaml`
+Instantiate the selected template by substituting environment variables:
+```bash
+envsubst < guides/benchmark/<selected-template>.yaml > config.yaml
+```
 
 ### Step 4: Select benchmark harness 
 
@@ -78,12 +112,18 @@ Display the instantiated configuration file to the user for verification. If the
 - **API settings**: Streaming mode, completion type
 - **Parallelism**: Number of parallel workload launcher pods
 
-### Step 8: Obtain the benchmarking script 
+### Step 8: Obtain the benchmarking script
 
-Use the following commands to download the benchmarking script:
+First check if `run_only.sh` is already available locally (it ships with the repo at `guides/benchmark/run_only.sh`). If so, use it directly — no download needed:
+```bash
+cp guides/benchmark/run_only.sh . && chmod u+x run_only.sh
+```
 
-`curl -L -O https://raw.githubusercontent.com/llm-d/llm-d-benchmark/main/existing_stack/run_only.sh`
-`chmod u+x run_only.sh`
+If not available locally, download it:
+```bash
+curl -L -O https://raw.githubusercontent.com/llm-d/llm-d-benchmark/main/existing_stack/run_only.sh
+chmod u+x run_only.sh
+```
 
 ### Step 9: Run benchmarking
 
@@ -152,6 +192,8 @@ Required tools:
 - helm
 - helmfile
 - git
+- yq (YAML processor, version ≥ 4) — required by `run_only.sh`
+- `timeout` utility — on macOS, install with `brew install coreutils` if missing
 
 
 ## Security Considerations
