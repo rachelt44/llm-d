@@ -1,13 +1,13 @@
 ---
 name: compare-llm-d-configurations
-description: Compare the benchmark performance of two llm-d stack configurations end-to-end. For each configuration, deploys the stack, runs a benchmark, tears down, then generates a side-by-side results comparison. Use this skill whenever the user wants to A/B test llm-d configurations, compare models or serving strategies, evaluate the effect of a configuration change, or run two benchmarks back-to-back for comparison — even if they say "which is faster", "test two setups", "compare these configs", or don't use "A/B" or "benchmark" terminology explicitly.
+description: Compare the benchmark performance of two llm-d stack configurations end-to-end. For each configuration, deploys the stack, runs a benchmark, tears down, then generates a side-by-side results comparison. One configuration may already have been benchmarked previously — in that case, only the new configuration is deployed and benchmarked, and its results are compared against the existing ones. Use this skill whenever the user wants to A/B test llm-d configurations, compare models or serving strategies, evaluate the effect of a configuration change, run two benchmarks back-to-back for comparison, or compare a new run against a previous one — even if they say "which is faster", "test two setups", "compare these configs", "compare against my last run", or don't use "A/B" or "benchmark" terminology explicitly.
 ---
 
 # Compare llm-d Configurations
 
 ## Purpose
 
-Orchestrate two consecutive benchmark runs against different llm-d stack configurations, then compare results side by side. Each run follows the same sequence: deploy → benchmark → save state → teardown. The comparison report is written to disk and displayed inline.
+Orchestrate two benchmark runs against different llm-d stack configurations, then compare results side by side. Each new run follows the sequence: deploy → benchmark → save state → teardown. If one configuration was already benchmarked in a previous session, its results can be loaded directly — only the other configuration goes through the full deploy/benchmark/teardown cycle. The comparison report is written to disk and displayed inline.
 
 ---
 
@@ -24,9 +24,55 @@ mkdir -p $COMPARISON_DIR/run-b/results
 echo "Comparison workspace: $COMPARISON_DIR"
 ```
 
-### 0.2 Name the Two Configurations
+### 0.2 Check for Pre-existing Run
 
-Ask the user for a short label for each run. Labels should capture what differs between the two (e.g., model name, scheduling strategy, hardware tier). Examples:
+Ask the user: *"Do you have results from a previous benchmark run you'd like to compare against, or are both configurations being run fresh?"*
+
+- **Both fresh** — proceed normally through Phases 1 and 2.
+- **One pre-existing** — ask which one (A or B) is pre-existing, then collect its details now (see below). Skip the deploy/benchmark/teardown phases for that run; only execute those phases for the new configuration.
+
+**Collecting pre-existing run details:**
+
+Ask the user for:
+1. A short label for the pre-existing run (e.g. "baseline-qwen2.5-7b")
+2. The path to its results directory (will be used for metric extraction in Phase 3)
+3. A brief summary of its configuration — guide used, model, hardware, harness, workload (whatever they remember; used to populate the config table in the report)
+
+Write a `run_state.json` for the pre-existing run directly into the comparison workspace, using the information provided:
+
+```json
+{
+  "label": "<user-provided label>",
+  "timestamp": "<timestamp of original run, or 'unknown'>",
+  "stack": {
+    "guide": "<guide or 'unknown'>",
+    "namespace": "<namespace or 'unknown'>",
+    "hardware": "<hardware or 'unknown'>",
+    "gateway": "<gateway or 'unknown'>",
+    "model": "<model or 'unknown'>"
+  },
+  "benchmark": {
+    "harness": "<harness or 'unknown'>",
+    "workload": "<workload or 'unknown'>",
+    "load_stages": "<load stages or 'unknown'>"
+  },
+  "results_path": "<absolute path to existing results directory>"
+}
+```
+
+Copy or symlink the existing results into the comparison workspace so everything is in one place:
+
+```bash
+# Copy (preferred — keeps the workspace self-contained)
+cp -r <existing-results-path> $COMPARISON_DIR/run-{a,b}/results/
+
+# Or symlink if the results are large
+ln -s <existing-results-path> $COMPARISON_DIR/run-{a,b}/results
+```
+
+### 0.3 Name the New (or Both) Configurations
+
+Ask the user for a short label for each run that still needs one. Labels should capture what differs between the two (e.g., model name, scheduling strategy, hardware tier). Examples:
 
 - "qwen2.5-7b-inference-scheduling" vs "llama3.1-8b-inference-scheduling"
 - "baseline" vs "prefill-decode-disagg"
@@ -35,13 +81,13 @@ Ask the user for a short label for each run. Labels should capture what differs 
 Save them for use throughout:
 
 ```bash
-RUN_A_LABEL="<user-provided label>"
-RUN_B_LABEL="<user-provided label>"
+RUN_A_LABEL="<label>"
+RUN_B_LABEL="<label>"
 ```
 
-### 0.3 Namespace
+### 0.4 Namespace
 
-Both runs share the same namespace by default. Identify it using the standard detection order:
+Only needed if at least one run is being deployed fresh. Both runs share the same namespace by default. Identify it using the standard detection order:
 
 1. If `NAMESPACE` is already set, use it.
 2. Check for an active `oc project`: `oc project -q 2>/dev/null`
@@ -50,6 +96,8 @@ Both runs share the same namespace by default. Identify it using the standard de
 ---
 
 ## Phase 1: Run A
+
+> **If Run A was pre-existing**: its `run_state.json` and results were already set up in Phase 0. Skip directly to Phase 2.
 
 Work through the following steps for the first configuration.
 
@@ -109,6 +157,8 @@ Follow the **teardown-llm-d-stack** skill workflow with these fixed constraints 
 ---
 
 ## Phase 2: Run B
+
+> **If Run B was pre-existing**: its `run_state.json` and results were already set up in Phase 0. Skip directly to Phase 3.
 
 Repeat the same sequence for the second configuration.
 
