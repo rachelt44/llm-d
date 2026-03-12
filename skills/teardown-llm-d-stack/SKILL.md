@@ -7,7 +7,7 @@ description: Tears down, removes, cleans up, or undeploys a deployed llm-d stack
 
 ## Purpose
 
-Cleanly remove a deployed llm-d stack from a Kubernetes namespace. Works regardless of which Well-lit Path guide was used to deploy the stack — no local repo or LLMD_PATH needed. Always confirms with the user before deleting anything.
+Cleanly remove a deployed llm-d stack from a Kubernetes namespace. Works regardless of which Well-lit Path guide was used to deploy the stack — no local repo is needed. Always confirms with the user before deleting anything.
 
 ---
 
