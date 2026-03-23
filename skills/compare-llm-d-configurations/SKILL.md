@@ -154,7 +154,6 @@ Follow the **teardown-llm-d-stack** skill workflow with these fixed constraints 
 - **Keep** PVCs — they may contain benchmark data and will be reused for results storage
 - **Keep** the namespace — it will be reused for Run B
 
----
 
 ## Phase 2: Run B
 
@@ -381,3 +380,13 @@ Two reusable scripts have been saved to $COMPARISON_DIR/:
 - **Minimal teardown between runs** — Helm releases and routing only; PVCs and namespace are preserved.
 - **Same namespace for both runs** — both runs deploy into the same namespace; the deploy skill will find it already exists, which is expected.
 - **Don't ask about optional teardown steps** — HTTPRoutes/Gateways are always removed between runs (to prevent conflicts), PVCs and namespace are always kept. These are not user choices in this workflow.
+
+
+## What Not To Do
+
+Critical rules to follow when comparing =llm-d configurations:
+
+1. **Do NOT change cluster-level definitions** — All changes must be made exclusively inside the designated project namespace. Never modify cluster-wide resources (e.g., ClusterRoles, ClusterRoleBindings, StorageClasses, Nodes, or any resource outside the target namespace). Scope every `kubectl apply`, `helm install`, and `helmfile apply` command to the target namespace using `-n ${NAMESPACE}`.
+
+2. **Do NOT modify any existing code you did not create** — Only create new files and modify them as needed. Never edit pre-existing files in the repository (e.g., existing `values.yaml`, `helmfile.yaml`, `httproute.yaml`, `README.md`, or any other committed file). If customization is required, create a new file (e.g., `values-custom.yaml`, `httproute-custom.yaml`) and reference it instead.
+
