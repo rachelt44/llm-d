@@ -40,6 +40,10 @@ decode:
     tensor: 1
   create: true
   replicas: 1
+  securityContext:
+    fsGroup: 107
+    supplementalGroups:
+      - 107
   monitoring:
     podmonitor:
       enabled: true
@@ -55,14 +59,9 @@ decode:
         - "64"
         - "--kv-transfer-config"
         - '{"kv_connector":"NixlConnector", "kv_role":"kv_both", "kv_buffer_device":"cpu"}'
-        - "--disable-log-requests"
         - "--disable-uvicorn-access-log"
         - "--max-model-len"
         - "32000"
-      securityContext:
-        fsGroup: 107
-        supplementalGroups:
-          - 107
       env:
         - name: UCX_TLS
           value: "tcp"
@@ -140,6 +139,10 @@ prefill:
     tensor: 1
   create: true
   replicas: 3
+  securityContext:
+    fsGroup: 107
+    supplementalGroups:
+      - 107
   monitoring:
     podmonitor:
       enabled: true
@@ -158,10 +161,6 @@ prefill:
         - "--disable-uvicorn-access-log"
         - "--max-model-len"
         - "32000"
-      securityContext:
-        fsGroup: 107
-        supplementalGroups:
-          - 107
       env:
         - name: UCX_TLS
           value: "tcp"
