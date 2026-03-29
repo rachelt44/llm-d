@@ -58,16 +58,13 @@ Make sure the `BENCHMARK_PVC` environment variable is set.
 
 ### Step 3: Determine the template configuration file for benchmarking and instantiate it
 
-List the available benchmarking template YAML files from the local `guides/benchmark/` directory:
-```bash
-ls guides/benchmark/*template*.yaml
-```
+List the available benchmarking template YAML files from the local `guides/*/benchmark-templates` directories. Show the user full paths so they know which guide each template originates from.
 
-Display them to the user and ask them to select one. If the local directory is not available, fall back to browsing https://github.com/llm-d/llm-d/tree/main/guides/benchmark.
+Display them to the user and ask them to select one. If the local directory is not available, fall back to browsing https://github.com/llm-d/llm-d/tree/main/guides/ and look for the content of `benchmark-templates` sub-directories.
 
 Instantiate the selected template by substituting environment variables:
 ```bash
-envsubst < guides/benchmark/<selected-template>.yaml > config.yaml
+envsubst < guides/<selected-guide>/benchmark-templates/<selected-template>.yaml > config.yaml
 ```
 
 ### Step 4: Select benchmark harness 
@@ -156,12 +153,6 @@ Ask the user whether an analysis of raw results is requested. For example, creat
 >
 > **RULE**: Before deleting or overriding ANY resources — including PVCs, files, or any Kubernetes object — you MUST first get confirmation from the user.
 >
-> **Format to use before every creation action**:
-> > "I am about to create `<resource-type>` named `<name>` because `<reason>`. Proceeding now."
->
-> **Examples**:
-> - "I am about to create PVC `llm-d-kv-cache-storage` (18000Gi, storage class: default) because no PVC was found in namespace `llm-d`. Proceeding now."
-> - "I am about to create file `${LLMD_PATH}/pvc.yaml` with the PVC definition. Proceeding now."
 >
 > **Never silently create resources.** If you are unsure whether a resource already exists, check first, then notify before acting.
 
