@@ -16,7 +16,7 @@ Skills run by code assistants accelerate task automation and standardize workflo
 
 ## Proposal
 
-We propose opening a dedicated skills repository for llm-d to accelerate development of workflows to be carried out with code assistants. The repository will be populated with the initial set of skills already created, and new skills will be added incrementally. The Each llm-d repository will be able to import skills aligned with its specific scope and goals.
+We propose opening a dedicated skills repository for llm-d to accelerate development of workflows to be carried out with code assistants. The repository will be populated with the initial set of skills already created, and new skills will be added incrementally. Each llm-d repository will be able to import skills aligned with its specific scope and goals.
 
 
 As a reference point, other open-source projects have already established skills repositories to accelerate development. For example, vLLM maintains a [skills repository](https://github.com/vllm-project/vllm-skills/blob/main/skills/vllm-prefix-cache-bench/SKILLS.md) that includes skills for basic and Docker-based deployment, as well as benchmarking automatic prefix caching. 
