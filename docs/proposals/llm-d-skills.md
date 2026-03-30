@@ -1,6 +1,6 @@
 # llm-d-skills for accelerated task automation and standardized workflows
 
-**Authors**: Rachel Brill (_IBM_), Michal Malka (_IBM_), Sharon Keidar-Barner (_IBM_)
+**Authors**: Rachel Brill (_IBM_), Sharon Keidar-Barner (_IBM_), Michal Malka (_IBM_)
 
 ## Summary
 
